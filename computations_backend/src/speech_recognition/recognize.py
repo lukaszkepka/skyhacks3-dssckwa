@@ -127,14 +127,14 @@ class SpeechToTextAlgorithm:
         was_in_range = False
         for range in response[label]['ranges']:
             if range['start'] < timestamp <= range['end']:
-                range['end'] = timestamp + self.word_time_range
+                range['end'] = int(timestamp + self.word_time_range)
                 was_in_range = True
 
         if not was_in_range:
             response[label]['ranges'].append(
                 {
-                    'start': timestamp,
-                    'end': timestamp + self.word_time_range,
+                    'start': int(timestamp),
+                    'end': int(timestamp + self.word_time_range),
                 }
             )
 
@@ -170,7 +170,7 @@ def main():
     lema_dict_path = '../../model/polimorfologik-2.1.txt'
     labels_dict_path = '../../model/labels_eng_pl.txt'
 
-    speech_to_text = SpeechToTextAlgorithm(text_model_path, lema_dict_path, labels_dict_path)
+    speech_to_text = SpeechToTextAlgorithm(text_model_lite_path, lema_dict_path, labels_dict_path)
     response = speech_to_text.process(mp3_file_path)
 
     print(json.dumps(response))
