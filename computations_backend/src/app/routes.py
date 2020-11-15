@@ -1,3 +1,4 @@
+import os
 from os import path
 
 from flask import request, jsonify
@@ -5,6 +6,43 @@ from app import app, speech_to_text_service, plots_generator, classification_ser
 import jsonpickle
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+
+@app.route('/process_file', methods=['GET'])
+def process_audio():
+    file_path = request.args.get('file_path')
+    extension = file_path.split('.')[-1]
+
+    if extension == 'mp3':
+        type = 'audio'
+        result = speech_to_text_service.process(file_path)
+    else:
+        type = 'video'
+        result = classification_service.process(file_path)
+
+    if not path.exists(file_path):
+        return app.response_class(
+            response=jsonpickle.encode({'reason': f"File {file_path} doesnt exists"}, make_refs=False,
+                                       unpicklable=False),
+            status=500,
+            mimetype='application/json'
+        )
+
+    plot_image = str(plots_generator.generate_plot(result, 30 * 1000))
+    plot_image = plot_image[2:-1]
+
+    response_body = {'results': result,
+                     'plot': plot_image,
+                     'type': type,
+                     }
+
+    response = app.response_class(
+        response=jsonpickle.encode(response_body, make_refs=False, unpicklable=False),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
 
 
 @app.route('/process_audio', methods=['GET'])
