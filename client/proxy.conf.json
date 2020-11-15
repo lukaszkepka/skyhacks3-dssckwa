@@ -1,0 +1,12 @@
+{
+  "/upload-avatar": {
+    "target": "http://localhost:3000",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/process_audio": {
+    "target": "http://localhost:5000",
+    "secure": true,
+    "changeOrigin": true
+  }
+}

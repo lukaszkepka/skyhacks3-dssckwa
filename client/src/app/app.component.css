@@ -1,0 +1,14 @@
+h1 {
+  color: orange;
+  font-weight: bold;
+  text-align: justify;
+}
+p {
+  color: #f1f3f4;
+  text-align: justify;
+  /* font-weight: bold; */
+}
+.form-group {
+  display: flex;
+  width: 100%;
+}
