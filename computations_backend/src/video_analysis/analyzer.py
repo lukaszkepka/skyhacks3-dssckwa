@@ -30,7 +30,12 @@ class VideoAnalyzer:
         self.image_size = 224
         self.labels = self.load_labels(labels_path)
         self.model = load_model(model_path, custom_objects={'f1_m': f1_m})
+        self.frame_time_range = 1000
+        self.results = {}
         pass
+
+    def clear_state(self):
+        self.results = {}
 
     def load_labels(self, labels_path):
         labels = []
@@ -41,10 +46,15 @@ class VideoAnalyzer:
         return np.expand_dims(np.array(labels), axis=0)
 
     def preprocess_frame(self, image):
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image = cv.resize(image, (self.image_size, self.image_size), interpolation=cv.INTER_AREA)
         image = np.expand_dims(image, axis=0)
         image = image / 255
+
         return image
+
+    def response_to_dto(self):
+        return list(self.results.values())
 
     def process_image_file(self, file_path):
         image = cv.imread(file_path)
@@ -52,8 +62,26 @@ class VideoAnalyzer:
         labels_values_pred = np.round(self.model.predict(image)).astype(bool)
         return [str(lbl) for lbl in list(self.labels[labels_values_pred])]
 
+    def append_results(self, labels, timestamp):
+        for label in labels:
+            if not self.results.__contains__(label):
+                self.results[label] = {'label': label, 'ranges': []}
+
+            was_in_range = False
+            for range in self.results[label]['ranges']:
+                if range['start'] < timestamp <= range['end']:
+                    range['end'] = int(timestamp + self.frame_time_range)
+                    was_in_range = True
+
+            if not was_in_range:
+                self.results[label]['ranges'].append(
+                    {
+                        'start': int(timestamp),
+                        'end': int(timestamp + self.frame_time_range),
+                    }
+                )
+
     def process_video_file(self, file_path):
-        labels = []
         cap = cv.VideoCapture(file_path)
         fps = cap.get(5)
 
@@ -79,7 +107,7 @@ class VideoAnalyzer:
             # Predict
             frame = self.preprocess_frame(frame)
             labels_values_pred = np.round(self.model.predict(frame)).astype(bool)
-            labels.append([str(lbl) for lbl in list(self.labels[labels_values_pred])])
+            self.append_results([str(lbl) for lbl in list(self.labels[labels_values_pred])], timestamp)
 
             # We have processed 30 seconds
             if timestamp >= 30000:
@@ -90,4 +118,7 @@ class VideoAnalyzer:
 
         # When everything done, release the capture
         cap.release()
-        return labels
+
+        resp = self.response_to_dto()
+        self.clear_state()
+        return resp

@@ -1,7 +1,7 @@
 from os import path
 
 from flask import request, jsonify
-from app import app, speech_to_text_service, classification_service
+from app import app, speech_to_text_service, plots_generator, classification_service
 import jsonpickle
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -20,8 +20,12 @@ def process_audio():
         )
 
     text_statistics = speech_to_text_service.process(file_path)
+
+    response_body = {'results': text_statistics,
+                     'plot': plots_generator.generate_plot(text_statistics, 30 * 1000)}
+
     response = app.response_class(
-        response=jsonpickle.encode(text_statistics, make_refs=False, unpicklable=False),
+        response=jsonpickle.encode(response_body, make_refs=False, unpicklable=False),
         status=200,
         mimetype='application/json'
     )
