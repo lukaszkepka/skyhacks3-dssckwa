@@ -9,16 +9,9 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 
 @app.route('/process_file', methods=['GET'])
-def process_audio():
+def process_file():
     file_path = request.args.get('file_path')
     extension = file_path.split('.')[-1]
-
-    if extension == 'mp3':
-        type = 'audio'
-        result = speech_to_text_service.process(file_path)
-    else:
-        type = 'video'
-        result = classification_service.process(file_path)
 
     if not path.exists(file_path):
         return app.response_class(
@@ -27,6 +20,13 @@ def process_audio():
             status=500,
             mimetype='application/json'
         )
+
+    if extension == 'mp3':
+        type = 'audio'
+        result = speech_to_text_service.process(file_path)
+    else:
+        type = 'video'
+        result = classification_service.process(file_path)
 
     plot_image = str(plots_generator.generate_plot(result, 30 * 1000))
     plot_image = plot_image[2:-1]
