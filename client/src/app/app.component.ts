@@ -1,6 +1,7 @@
 import { HttpClient, HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { DomSanitizer } from "@angular/platform-browser";
 import { pipe } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 import { LabelByPeriods } from "./audio/audio.component";
@@ -27,7 +28,7 @@ export function toResponseBody<T>() {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnInit {
   @ViewChild(FileUploaderComponent) fileUploaderComponent: FileUploaderComponent;
 
   progress = 0;
@@ -35,7 +36,7 @@ export class AppComponent implements AfterViewInit {
   showUserMedia: boolean;
   userMediaResult: LabelByPeriods[];
   isUserMediaLoading = false;
-  chartImage: string;
+  chartImage: any;
 
   activeRange: Range;
 
@@ -45,16 +46,24 @@ export class AppComponent implements AfterViewInit {
 
   signup = new FormGroup({
     // email: new FormControl(null, Validators.required),
-    image: new FormControl(null, [Validators.required, requiredFileType('png')])
+    image: new FormControl(null, Validators.required)
   });
   success = false;
 
-  constructor( private http: HttpClient ) {
+  constructor( private http: HttpClient, private sanitizer: DomSanitizer ) {
   }
   ngAfterViewInit(): void {
     // this.fileUploaderComponent.registerOnChange((file: File) => this.userMediaUrl = URL.createObjectURL(file))
   }
 
+  ngOnInit() {
+    this.signup.statusChanges.subscribe(status => {
+      console.log(status);
+      if (status === 'VALID') {
+         this.submit();
+      }
+   });
+  }
 
   submit() {
     this.success = false;
@@ -82,7 +91,7 @@ export class AppComponent implements AfterViewInit {
       console.log(res);
 
       const path = ((res as any).path as string).replace('\/', '\\');
-      this.http.get('http://127.0.0.1:5000/process_audio?file_path=' + path)
+      this.http.get('http://127.0.0.1:5000/process_file?file_path=' + path)
       .subscribe((res2: {results: LabelByPeriods[], plot: any}) => {
         console.log(res2);
         res2.results.forEach(labelByPeriod => {
@@ -96,7 +105,9 @@ export class AppComponent implements AfterViewInit {
           });
         });
         this.userMediaResult = res2.results;
-        this.chartImage = res2.plot['py/b64'];
+        // this.chartImage = res2.plot['py/b64'];
+        this.chartImage = this.sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+                 + res2.plot);
         this.isUserMediaLoading = false;
       });
       // this.http.get('/process_audio', {

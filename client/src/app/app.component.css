@@ -1,3 +1,29 @@
+.app-comp {
+  display: flex;
+  margin-top: 5%;
+  margin-left: 10%;
+  margin-right: 10%;
+  width:80%;
+}
+
+.left-part {
+  width: 35%;
+}
+
+.right-part {
+  flex: 1 1 auto;
+  height: 100%;
+
+  margin-top: 25px;
+  margin-left: 30px;
+  width: 65%;
+}
+
+img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
 h1 {
   color: orange;
   font-weight: bold;
@@ -6,7 +32,6 @@ h1 {
 p {
   color: #f1f3f4;
   text-align: justify;
-  /* font-weight: bold; */
 }
 .form-group {
   display: flex;

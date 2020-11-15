@@ -26,7 +26,7 @@ def process_file():
         result = speech_to_text_service.process(file_path)
     else:
         type = 'video'
-        result = classification_service.process(file_path)
+        result = classification_service.process_video_file(file_path)
 
     plot_image = str(plots_generator.generate_plot(result, 30 * 1000))
     plot_image = plot_image[2:-1]
