@@ -20,9 +20,11 @@ def process_audio():
         )
 
     text_statistics = speech_to_text_service.process(file_path)
+    plot_image = str(plots_generator.generate_plot(text_statistics, 30 * 1000))
+    plot_image = plot_image[2:-1]
 
     response_body = {'results': text_statistics,
-                     'plot': plots_generator.generate_plot(text_statistics, 30 * 1000)}
+                     'plot': plot_image}
 
     response = app.response_class(
         response=jsonpickle.encode(response_body, make_refs=False, unpicklable=False),
@@ -47,7 +49,7 @@ def process_image():
 
     label_statistics = classification_service.process_image_file(file_path)
     response_body = {'results': label_statistics,
-                     'plot': plots_generator.generate_plot(label_statistics, 30 * 1000)}
+                     'plot': str(plots_generator.generate_plot(label_statistics, 30 * 1000))}
 
     response = app.response_class(
         response=jsonpickle.encode({'labels': response_body}, make_refs=False, unpicklable=False),
@@ -71,8 +73,11 @@ def process_video():
         )
 
     label_statistics = classification_service.process_video_file(file_path)
+    plot_image = str(plots_generator.generate_plot(label_statistics, 30 * 1000))
+    plot_image = plot_image[2:-1]
+
     response_body = {'results': label_statistics,
-                     'plot': plots_generator.generate_plot(label_statistics, 30 * 1000)}
+                     'plot': plot_image}
 
     response = app.response_class(
         response=jsonpickle.encode(response_body, make_refs=False, unpicklable=False),
