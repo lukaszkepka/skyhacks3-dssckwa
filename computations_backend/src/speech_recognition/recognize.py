@@ -39,11 +39,16 @@ class SpeechToTextAlgorithm:
             len_dict[line_parts[1]] = line_parts[0]
         return len_dict
 
-    def convert_to_wav(self, mp3_file_path):
+    def convert_to_30s_wav(self, mp3_file_path):
         output_file_path = mp3_file_path[:-3] + "wav"
         sound = AudioSegment.from_mp3(mp3_file_path)
-        sound.export(output_file_path, format="wav")
+        sound_30s = sound[:30000]
+        sound_30s.export(output_file_path, format="wav")
         return output_file_path
+
+
+
+
 
     def parse_speech_to_text_result(self, evt):
         print(evt.result.json)
@@ -85,7 +90,8 @@ class SpeechToTextAlgorithm:
         speech_config.request_word_level_timestamps()
         speech_config.output_format = speechsdk.OutputFormat.Detailed
 
-        audio_config = speechsdk.audio.AudioConfig(filename=wav_file_path)
+        audio_config = speechsdk.audio.AudioConfig(filename=wav_file_path
+                                                   )
         speech_recognizer = speechsdk.SpeechRecognizer(
             speech_config=speech_config,
             audio_config=audio_config
@@ -140,7 +146,7 @@ class SpeechToTextAlgorithm:
 
     def process(self, mp3_file_path):
         response = {}
-        wav_file_path = self.convert_to_wav(mp3_file_path)
+        wav_file_path = self.convert_to_30s_wav(mp3_file_path)
         self.extract_text_from_speech(wav_file_path)
 
         for word_metadata in self.word_metadata_list:
