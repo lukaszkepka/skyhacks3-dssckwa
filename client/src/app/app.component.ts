@@ -35,6 +35,7 @@ export class AppComponent implements AfterViewInit {
   showUserMedia: boolean;
   userMediaResult: LabelByPeriods[];
   isUserMediaLoading = false;
+  chartImage: string;
 
   activeRange: Range;
 
@@ -81,21 +82,21 @@ export class AppComponent implements AfterViewInit {
       console.log(res);
 
       const path = ((res as any).path as string).replace('\/', '\\');
-//C:\\Users\\mpszczolka\\udemy\\skyExpress\\712270.mp3
       this.http.get('http://127.0.0.1:5000/process_audio?file_path=' + path)
-      .subscribe((res2: LabelByPeriods[]) => {
+      .subscribe((res2: {results: LabelByPeriods[], plot: any}) => {
         console.log(res2);
-        res2.forEach(labelByPeriod => {
+        res2.results.forEach(labelByPeriod => {
           labelByPeriod.ranges = labelByPeriod.ranges.map(range => {
             return {
-              start: range.start / 10000,
-              end: range.end / 10000,
+              start: range.start / 1000,
+              end: range.end / 1000,
               startAsMinutes: this.toMinutesString(range.start / 1000),
               endAsMinutes: this.toMinutesString(range.end / 1000)
             };
           });
         });
-        this.userMediaResult = res2;
+        this.userMediaResult = res2.results;
+        this.chartImage = res2.plot['py/b64'];
         this.isUserMediaLoading = false;
       });
       // this.http.get('/process_audio', {
