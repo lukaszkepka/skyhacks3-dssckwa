@@ -1,7 +1,7 @@
 from os import path
 
 from flask import request, jsonify
-from app import app, speech_to_text_service, plots_generator
+from app import app, speech_to_text_service, plots_generator, classification_service
 import jsonpickle
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -13,7 +13,8 @@ def process_audio():
 
     if not path.exists(file_path):
         return app.response_class(
-            response=jsonpickle.encode({'reason': f"File {file_path} doesnt exists"}, make_refs=False, unpicklable=False),
+            response=jsonpickle.encode({'reason': f"File {file_path} doesnt exists"}, make_refs=False,
+                                       unpicklable=False),
             status=500,
             mimetype='application/json'
         )
@@ -25,6 +26,50 @@ def process_audio():
 
     response = app.response_class(
         response=jsonpickle.encode(response_body, make_refs=False, unpicklable=False),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
+
+
+@app.route('/process_image', methods=['GET'])
+def process_image():
+    file_path = request.args.get('file_path')
+
+    if not path.exists(file_path):
+        return app.response_class(
+            response=jsonpickle.encode({'reason': f"File {file_path} doesnt exists"}, make_refs=False,
+                                       unpicklable=False),
+            status=500,
+            mimetype='application/json'
+        )
+
+    label_statistics = classification_service.process_image_file(file_path)
+    response = app.response_class(
+        response=jsonpickle.encode({'labels': label_statistics}, make_refs=False, unpicklable=False),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
+
+
+@app.route('/process_video', methods=['GET'])
+def process_video():
+    file_path = request.args.get('file_path')
+
+    if not path.exists(file_path):
+        return app.response_class(
+            response=jsonpickle.encode({'reason': f"File {file_path} doesnt exists"}, make_refs=False,
+                                       unpicklable=False),
+            status=500,
+            mimetype='application/json'
+        )
+
+    label_statistics = classification_service.process_video_file(file_path)
+    response = app.response_class(
+        response=jsonpickle.encode(label_statistics, make_refs=False, unpicklable=False),
         status=200,
         mimetype='application/json'
     )

@@ -144,7 +144,7 @@ class SpeechToTextAlgorithm:
         self.extract_text_from_speech(wav_file_path)
 
         for word_metadata in self.word_metadata_list:
-            timestamp = word_metadata['Offset'] / 100
+            timestamp = word_metadata['Offset'] / 10000
             original_word = word_metadata['Word'].lower()
             word = self.preprocess_word(original_word)
 
@@ -161,20 +161,3 @@ class SpeechToTextAlgorithm:
 
         self.clear_temp_data()
         return self.response_to_dto(response)
-
-
-def main():
-    mp3_file_path = 'C:\\Users\\Lukasz Kepka\\Downloads\\audio_all\\audio_all\\audio_tour\\69384\\pl\\625986.mp3'
-    text_model_lite_path = '../../model/wiki-lemmas-all-100-skipg-ns.txt'
-    text_model_path = '../../model/nkjp+wiki-forms-all-300-skipg-hs-50.txt'
-    lema_dict_path = '../../model/polimorfologik-2.1.txt'
-    labels_dict_path = '../../model/labels_eng_pl.txt'
-
-    speech_to_text = SpeechToTextAlgorithm(text_model_lite_path, lema_dict_path, labels_dict_path)
-    response = speech_to_text.process(mp3_file_path)
-
-    print(json.dumps(response))
-
-
-if __name__ == "__main__":
-    main()
