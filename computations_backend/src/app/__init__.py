@@ -1,8 +1,10 @@
 from flask import Flask
+from flask_cors import CORS
 
 from speech_recognition.recognize import SpeechToTextAlgorithm
 
 app = Flask(__name__)
+CORS(app)
 
 mp3_file_path = 'C:\\Users\\Lukasz Kepka\\Downloads\\audio_all\\audio_all\\audio_tour\\69384\\pl\\625986.mp3'
 text_model_lite_path = '../model/wiki-lemmas-all-100-skipg-ns.txt'
