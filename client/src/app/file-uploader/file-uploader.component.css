@@ -1,0 +1,18 @@
+label {
+  height: 40px;
+  color: #f1f3f4;
+  background: none;
+  border: 3px solid orange;
+  cursor: pointer;
+  font-weight: normal;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center;
+}
+label:hover {
+  background: orange;
+  border: 3px solid orange;
+  color: black;
+}

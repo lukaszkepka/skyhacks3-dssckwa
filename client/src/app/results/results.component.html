@@ -1,0 +1,22 @@
+<div class="grid">
+  <span>
+    <strong>Label</strong>
+  </span>
+  <span>
+    <strong>Count</strong>
+  </span>
+  <span>
+    <strong>Periods</strong>
+  </span>
+  <ng-container *ngFor="let labelByPeriod of labelsByPeriods">
+    <span class="row">{{labelByPeriod.label}}</span>
+    <span class="row">{{labelByPeriod.ranges.length}}</span>
+    <span class="periods row">
+      <ng-container *ngFor="let period of labelByPeriod.ranges">
+        <div (click)="periodClicked(period)">
+          {{period.startAsMinutes}}-{{period.endAsMinutes}}
+        </div>
+      </ng-container>
+    </span>
+  </ng-container>
+</div>

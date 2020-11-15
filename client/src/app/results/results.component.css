@@ -1,0 +1,19 @@
+.grid {
+  background-color: #f1f3f4;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+.grid > span.row {
+  border-top: orange 1px solid;
+}
+
+.periods {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
