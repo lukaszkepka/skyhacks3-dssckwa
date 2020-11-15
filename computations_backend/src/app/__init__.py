@@ -1,9 +1,11 @@
 from flask import Flask
+from flask_cors import CORS
 
 from speech_recognition.recognize import SpeechToTextAlgorithm
 from video_analysis.analyzer import VideoAnalyzer
 
 app = Flask(__name__)
+CORS(app)
 
 text_model_lite_path = '../model/wiki-lemmas-all-100-skipg-ns.txt'
 text_model_path = '../model/nkjp+wiki-forms-all-300-skipg-hs-50.txt'
