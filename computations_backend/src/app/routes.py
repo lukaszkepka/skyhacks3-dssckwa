@@ -46,8 +46,11 @@ def process_image():
         )
 
     label_statistics = classification_service.process_image_file(file_path)
+    response_body = {'results': label_statistics,
+                     'plot': plots_generator.generate_plot(label_statistics, 30 * 1000)}
+
     response = app.response_class(
-        response=jsonpickle.encode({'labels': label_statistics}, make_refs=False, unpicklable=False),
+        response=jsonpickle.encode({'labels': response_body}, make_refs=False, unpicklable=False),
         status=200,
         mimetype='application/json'
     )
@@ -68,8 +71,11 @@ def process_video():
         )
 
     label_statistics = classification_service.process_video_file(file_path)
+    response_body = {'results': label_statistics,
+                     'plot': plots_generator.generate_plot(label_statistics, 30 * 1000)}
+
     response = app.response_class(
-        response=jsonpickle.encode(label_statistics, make_refs=False, unpicklable=False),
+        response=jsonpickle.encode(response_body, make_refs=False, unpicklable=False),
         status=200,
         mimetype='application/json'
     )
